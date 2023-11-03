@@ -5,7 +5,9 @@
 package frc.robot;
 
 import org.photonvision.PhotonCamera;
+import org.photonvision.PhotonUtils;
 
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Vision extends SubsystemBase {
@@ -14,8 +16,16 @@ public class Vision extends SubsystemBase {
   public Vision() {
     
   }
-  public void getResult() {
-    var result = camera.getLatestResult();
+  public double getCurrentYaw() {
+    var target = camera.getLatestResult().getBestTarget();
+    return target.getYaw();
+  }
+  public double getCurrentPitch() {
+    var target = camera.getLatestResult().getBestTarget();
+    return target.getPitch();
+  }
+  public double getCurrentDist() {
+    return PhotonUtils.calculateDistanceToTargetMeters(1, 1.5, Units.degreesToRadians(12), 0);
   }
   @Override
   public void periodic() {
