@@ -8,7 +8,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 
 public class RobotContainer {
+  Turn turnSub = new Turn();
+  Vision visionSub = new Vision();
   public RobotContainer() {
+    turnSub.setDefaultCommand(turnSub.followTarget(visionSub.getCurrentYaw()));
     configureBindings();
   }
 
