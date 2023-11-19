@@ -6,46 +6,37 @@ package frc.robot;
 
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonUtils;
+import org.photonvision.targeting.PhotonPipelineResult;
+import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Vision extends SubsystemBase {
-  NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
-NetworkTableEntry tx = table.getEntry("tx");
-NetworkTableEntry ty = table.getEntry("ty");
-NetworkTableEntry ta = table.getEntry("ta");
-
-//read values periodically
-double x = tx.getDouble(0.0);
-double y = ty.getDouble(0.0);
-double area = ta.getDouble(0.0);
-
-//post to smart dashboard periodically
-  /** Creates a new Vision. */
-PhotonCamera camera = new PhotonCamera(null, getName());
+PhotonCamera camera;
+PhotonPipelineResult currentResult;
   public Vision() {
-    SmartDashboard.putNumber("LimelightX", x);
-    SmartDashboard.putNumber("LimelightY", y);
-    SmartDashboard.putNumber("LimelightArea", area);
+    camera = new PhotonCamera("limelight");
+  }
+  public PhotonTrackedTarget getBestTarget() {
+    return currentResult.getBestTarget();
   }
   public double getCurrentYaw() {
-    var target = camera.getLatestResult().getBestTarget();
-    return target.getYaw();
+    return getBestTarget().getYaw();
   }
   public double getCurrentPitch() {
-    var target = camera.getLatestResult().getBestTarget();
-    return target.getPitch();
+    return getBestTarget().getPitch();
   }
   public double getCurrentDist() {
-    return PhotonUtils.calculateDistanceToTargetMeters(1, 1.5, Units.degreesToRadians(12), 0);
+    return PhotonUtils.calculateDistanceToTargetMeters(
+      1, 
+      1.5, 
+      Units.degreesToRadians(12), 
+      Units.degreesToRadians(getBestTarget().getPitch())
+      );
   }
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
+    currentResult = camera.getLatestResult();
   }
 }
